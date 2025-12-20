@@ -4,8 +4,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Daily Task Scheduler</title>
 
-  <!-- PWA Manifest (inline, offline-first) -->
-  <link rel="manifest" href='data:application/json,{"name":"Daily Task Scheduler","short_name":"Scheduler","start_url":".","display":"standalone","background_color":"#f7f5ff","theme_color":"#9a8cff","icons":[{"src":"data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" rx=\"20\" fill=\"%239a8cff\"/><text x=\"50\" y=\"62\" font-size=\"48\" text-anchor=\"middle\" fill=\"white\">✓</text></svg>","sizes":"192x192","type":"image/svg+xml"}]}'>
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#9a8cff">
 
   <style>
     :root{
@@ -14,28 +15,15 @@
       --blue:#8bbcff;
       --card:#ffffff;
       --green:#4caf50;
-      --bg-gradient:linear-gradient(135deg,#f5e9f1,#ece9ff,#e9f2ff);
-    }
-
-    body.dark{
-      --pink:#b06a8a;
-      --purple:#5f55c9;
-      --blue:#4f79c9;
-      --card:#1e1e2a;
-      --green:#4caf50;
-      --bg-gradient:linear-gradient(135deg,#1a1623,#1b1a2e,#141b2b);
-      color:#f1f1f1;
     }
 
     body{
       font-family: Arial, Helvetica, sans-serif;
-      background:var(--bg-gradient);
+      background:linear-gradient(135deg,#f5e9f1,#ece9ff,#e9f2ff);
       margin:0;
       padding:15px;
       min-height:100vh;
     }
-
-    h1{ margin:0 0 5px 0; }
 
     .container{
       max-width:1100px;
@@ -46,22 +34,26 @@
       box-shadow:0 10px 30px rgba(0,0,0,0.15);
     }
 
-    .top-bar{
-      display:flex;
-      flex-wrap:wrap;
-      gap:15px;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:15px;
+    h1{
+      margin:0 0 10px 0;
     }
 
     .motivation{
-      background:var(--bg-gradient);
+      background:linear-gradient(135deg,var(--pink),var(--purple));
       color:white;
       padding:10px 14px;
       border-radius:12px;
       font-weight:bold;
-      width:100%;
+      margin-bottom:12px;
+    }
+
+    .top-bar{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      align-items:center;
+      gap:15px;
+      margin-bottom:15px;
     }
 
     .progress-wrapper{
@@ -74,7 +66,7 @@
       width:80px;
       height:80px;
       border-radius:50%;
-      background:conic-gradient(#4caf50 0deg, #eee 0deg);
+      background:conic-gradient(var(--green) 0deg, #e6e6e6 0deg);
       display:flex;
       align-items:center;
       justify-content:center;
@@ -94,7 +86,9 @@
       font-size:14px;
     }
 
-    th{ background:#f2f0ff; }
+    th{
+      background:#f2f0ff;
+    }
 
     input[type="text"], input[type="time"]{
       width:100%;
@@ -106,14 +100,16 @@
     button{
       padding:8px 12px;
       border:none;
-      background:var(--bg-gradient);
+      background:linear-gradient(135deg,var(--purple),var(--blue));
       color:white;
       cursor:pointer;
       border-radius:8px;
       font-weight:bold;
     }
 
-    button.delete{ background:#ff4d6d; }
+    button.delete{
+      background:#ff4d6d;
+    }
 
     .controls{
       margin-top:12px;
@@ -130,28 +126,33 @@
     }
 
     .stat-card{
-      background:var(--bg-gradient);
+      background:linear-gradient(135deg,var(--blue),var(--purple));
       color:white;
       padding:12px;
       border-radius:12px;
     }
 
     @media(max-width:600px){
-      th:nth-child(3), th:nth-child(4), td:nth-child(3), td:nth-child(4){ display:none; }
+      th:nth-child(3),
+      th:nth-child(4),
+      td:nth-child(3),
+      td:nth-child(4){
+        display:none;
+      }
     }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1 id="greeting">Daily Task Scheduler</h1>
+  <h1 id="greeting"></h1>
 
   <div class="motivation" id="motivation"></div>
 
   <div class="top-bar">
     <div>
       <strong>Date:</strong><br>
-      <input type="date" id="datePicker" />
+      <input type="date" id="datePicker">
     </div>
 
     <div class="progress-wrapper">
@@ -175,7 +176,6 @@
   </table>
 
   <div class="controls">
-    <button onclick="toggleDarkMode()">🌙 Dark Mode</button>
     <button onclick="openRepeat()">↻ Repeat Task</button>
     <button onclick="addTask()">+ Add Task</button>
     <button onclick="clearTasks()">Clear Day</button>
@@ -189,6 +189,15 @@
 </div>
 
 <script>
+  /* USER GREETING */
+  let userName = localStorage.getItem('userName');
+  if (!userName) {
+    userName = prompt('What is your name?') || 'There';
+    localStorage.setItem('userName', userName);
+  }
+  document.getElementById('greeting').textContent = `Hey ${userName}!`;
+
+  /* MOTIVATION */
   const phrases = [
     "Progress, not perfection.",
     "Small steps still move you forward.",
@@ -196,13 +205,8 @@
     "Consistency beats motivation.",
     "Do one thing today better than yesterday."
   ];
-
-  let userName = localStorage.getItem('userName');
-  if(!userName){
-    userName = prompt('What is your name?') || 'There';
-    localStorage.setItem('userName', userName);
-  }
-  document.getElementById('greeting').textContent = `Hey ${userName}!`;
+  document.getElementById('motivation').textContent =
+    phrases[new Date().getDay() % phrases.length];
 
   const tableBody = document.querySelector('#taskTable tbody');
   const progressCircle = document.getElementById('progressCircle');
@@ -210,83 +214,104 @@
   const datePicker = document.getElementById('datePicker');
 
   datePicker.valueAsDate = new Date();
-  document.getElementById('motivation').textContent = phrases[new Date().getDay() % phrases.length];
 
   function addTask(data={}, skipSave=false){
-    const row=document.createElement('tr');
-    row.innerHTML=`
+    const row = document.createElement('tr');
+    row.innerHTML = `
       <td><input type="checkbox" class="done"></td>
       <td><input type="text" value="${data.task||''}"></td>
       <td><input type="time" value="${data.start||''}"></td>
       <td><input type="time" value="${data.end||''}"></td>
       <td><input type="text" value="${data.notes||''}"></td>
-      <td><button class="delete">X</button></td>`;
+      <td><button class="delete">X</button></td>
+    `;
 
-    row.querySelector('.done').checked=data.done||false;
-    row.querySelector('.done').onchange=updateProgress;
-    row.querySelector('.delete').onclick=()=>{row.remove();updateProgress();save();};
+    row.querySelector('.done').checked = data.done || false;
+    row.querySelector('.done').onchange = updateProgress;
+    row.querySelector('.delete').onclick = () => {
+      row.remove();
+      updateProgress();
+      save();
+    };
 
     tableBody.appendChild(row);
     updateProgress();
-    if(!skipSave) save();
+    if (!skipSave) save();
   }
 
   function updateProgress(){
-    const checks=[...document.querySelectorAll('.done')];
-    const total=checks.length;
-    const done=checks.filter(c=>c.checked).length;
-    const pct=total?Math.round(done/total*100):0;
+    const checks = [...document.querySelectorAll('.done')];
+    const total = checks.length;
+    const done = checks.filter(c => c.checked).length;
+    const pct = total ? Math.round(done / total * 100) : 0;
 
-    progressCircle.style.background = `conic-gradient(#4caf50 ${pct * 3.6}deg, #e6e6e6 0deg)`;
-    progressCircle.textContent=pct+'%';
-    progressText.textContent=`${done}/${total} completed`;
+    progressCircle.style.background =
+      `conic-gradient(#4caf50 ${pct * 3.6}deg, #e6e6e6 0deg)`;
+
+    progressCircle.textContent = pct + '%';
+    progressText.textContent = `${done}/${total} completed`;
 
     updateStats(pct);
     save();
   }
 
   function save(){
-    const data=[];
-    document.querySelectorAll('tbody tr').forEach(r=>{
-      const i=r.querySelectorAll('input');
-      data.push({done:i[0].checked,task:i[1].value,start:i[2].value,end:i[3].value,notes:i[4].value});
+    const data = [];
+    document.querySelectorAll('tbody tr').forEach(r => {
+      const i = r.querySelectorAll('input');
+      data.push({
+        done:i[0].checked,
+        task:i[1].value,
+        start:i[2].value,
+        end:i[3].value,
+        notes:i[4].value
+      });
     });
-    localStorage.setItem(datePicker.value,JSON.stringify({tasks:data,percent:progressCircle.textContent}));
+    localStorage.setItem(
+      datePicker.value,
+      JSON.stringify({ tasks:data, percent:progressCircle.textContent })
+    );
   }
 
   function load(){
-    tableBody.innerHTML='';
-    const saved=localStorage.getItem(datePicker.value);
-    if(saved){ JSON.parse(saved).tasks.forEach(addTask); }
+    tableBody.innerHTML = '';
+    const saved = localStorage.getItem(datePicker.value);
+    if (saved) JSON.parse(saved).tasks.forEach(addTask);
     updateProgress();
   }
 
-  function clearTasks(){ if(confirm('Clear today?')){tableBody.innerHTML='';updateProgress();save();} }
+  function clearTasks(){
+    if (confirm('Clear today?')) {
+      tableBody.innerHTML = '';
+      updateProgress();
+      save();
+    }
+  }
 
   function updateStats(today){
-    document.getElementById('todayStat').textContent=`Today: ${today}%`;
-    document.getElementById('weekStat').textContent=`This Week: ${avg(0)}% avg`;
-    document.getElementById('prevWeekStat').textContent=`Last Week: ${avg(7)}% avg`;
+    document.getElementById('todayStat').textContent = `Today: ${today}%`;
+    document.getElementById('weekStat').textContent = `This Week: ${avg(0)}% avg`;
+    document.getElementById('prevWeekStat').textContent = `Last Week: ${avg(7)}% avg`;
   }
 
   function avg(offset){
-    let sum=0,count=0;
+    let sum = 0, count = 0;
     for(let i=0;i<7;i++){
-      const d=new Date();
-      d.setDate(d.getDate()-i-offset);
-      const key=d.toISOString().slice(0,10);
-      const s=localStorage.getItem(key);
-      if(s){ sum+=parseInt(JSON.parse(s).percent); count++; }
+      const d = new Date();
+      d.setDate(d.getDate() - i - offset);
+      const key = d.toISOString().slice(0,10);
+      const s = localStorage.getItem(key);
+      if (s) {
+        sum += parseInt(JSON.parse(s).percent);
+        count++;
+      }
     }
-    return count?Math.round(sum/count):0;
+    return count ? Math.round(sum / count) : 0;
   }
-
-  datePicker.onchange=load;
-  load();
 
   function openRepeat(){
     const task = prompt('Task name:');
-    if(!task) return;
+    if (!task) return;
     const time = prompt('Start time (HH:MM):','15:30');
     const days = parseInt(prompt('Repeat for how many days?','14'));
     const interval = parseInt(prompt('Every how many days?','2'));
@@ -294,43 +319,29 @@
     const baseDate = new Date(datePicker.value);
     for(let i=0;i<days;i+=interval){
       const d = new Date(baseDate);
-      d.setDate(d.getDate()+i);
+      d.setDate(d.getDate() + i);
       const key = d.toISOString().slice(0,10);
       const saved = localStorage.getItem(key);
-      const obj = saved ? JSON.parse(saved) : {tasks:[],percent:'0%'};
-      obj.tasks.push({done:false,task,start:time,end:'',notes:'Repeated'});
-      localStorage.setItem(key,JSON.stringify(obj));
+      const obj = saved ? JSON.parse(saved) : { tasks:[], percent:'0%' };
+      obj.tasks.push({
+        done:false,
+        task,
+        start:time,
+        end:'',
+        notes:'Repeated'
+      });
+      localStorage.setItem(key, JSON.stringify(obj));
     }
     load();
   }
 
-  // PWA Service Worker (inline, offline-first)
+  datePicker.onchange = load;
+  load();
+
+  /* SERVICE WORKER */
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js');
   }
-
-  function toggleDarkMode(){
-    document.body.classList.toggle('dark');
-    localStorage.setItem('darkMode', document.body.classList.contains('dark'));
-  }
-
-  if(localStorage.getItem('darkMode') === 'true'){
-    document.body.classList.add('dark');
-  });
-
-      self.addEventListener('fetch', e => {
-        e.respondWith(
-          caches.match(e.request).then(r => r || fetch(e.request))
-        );
-      });
-    `;
-
-    const blob = new Blob([swCode], { type: 'text/javascript' });
-    const swURL = URL.createObjectURL(blob);
-
-    navigator.serviceWorker.register(swURL);
-  }
 </script>
-
 </body>
 </html>

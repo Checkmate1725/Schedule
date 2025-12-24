@@ -1,347 +1,162 @@
-<html>
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Daily Task Scheduler</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الصفحة الرئيسية</title>
 
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#9a8cff">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Scheherazade+New&display=swap" rel="stylesheet">
 
   <style>
-    :root{
-      --pink:#f2a1c2;
-      --purple:#9a8cff;
-      --blue:#8bbcff;
-      --card:#ffffff;
-      --green:#4caf50;
+    * {
+      box-sizing: border-box;
+      font-family: "Amiri", "Scheherazade New", serif;
     }
 
-    body{
-      font-family: Arial, Helvetica, sans-serif;
-      background:linear-gradient(135deg,#f5e9f1,#ece9ff,#e9f2ff);
-      margin:0;
-      padding:15px;
-      min-height:100vh;
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f6efe4, #efe4d3);
+      color: #3b2f25;
+      direction: rtl;
+      display: flex;
     }
 
-    .container{
-      max-width:1100px;
-      margin:auto;
-      background:var(--card);
-      padding:15px;
-      border-radius:16px;
-      box-shadow:0 10px 30px rgba(0,0,0,0.15);
+    .side-bar {
+      width: 120px;
+      background: linear-gradient(180deg, #6b8f71, #4a6f73);
+      position: relative;
+      flex-shrink: 0;
     }
 
-    h1{
-      margin:0 0 10px 0;
+    .side-bar::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -6px;
+      width: 6px;
+      height: 100%;
+      background: #c7a458;
     }
 
-    .motivation{
-      background:linear-gradient(135deg,var(--pink),var(--purple));
-      color:white;
-      padding:10px 14px;
-      border-radius:12px;
-      font-weight:bold;
-      margin-bottom:12px;
+    .side-bar.right::after {
+      left: auto;
+      right: -6px;
     }
 
-    .top-bar{
-      display:flex;
-      flex-wrap:wrap;
-      justify-content:space-between;
-      align-items:center;
-      gap:15px;
-      margin-bottom:15px;
+    .main-content {
+      flex: 1;
+      padding: 50px 20px;
+      text-align: center;
     }
 
-    .progress-wrapper{
-      display:flex;
-      align-items:center;
-      gap:12px;
+    .verse {
+      font-size: 2.1rem;
+      margin-bottom: 36px;
+      color: #2f4b7c;
+      line-height: 1.8;
     }
 
-    .circle{
-      width:80px;
-      height:80px;
-      border-radius:50%;
-      background:conic-gradient(var(--green) 0deg, #e6e6e6 0deg);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:bold;
+    .search-box {
+      max-width: 520px;
+      margin: 0 auto;
     }
 
-    table{
-      width:100%;
-      border-collapse:collapse;
-      margin-top:10px;
+    .search-box input {
+      width: 100%;
+      padding: 16px 20px;
+      font-size: 1.15rem;
+      border-radius: 999px;
+      border: 2px solid #6b8f71;
+      background: #fffaf1;
+      outline: none;
     }
 
-    th, td{
-      border:1px solid #ddd;
-      padding:6px;
-      text-align:center;
-      font-size:14px;
+    .results {
+      margin-top: 36px;
+      max-width: 560px;
+      margin-left: auto;
+      margin-right: auto;
+      position: relative;
+      z-index: 5;
     }
 
-    th{
-      background:#f2f0ff;
+    .results a {
+      display: block;
+      background: #fffaf1;
+      margin-bottom: 14px;
+      padding: 16px;
+      border-radius: 16px;
+      text-decoration: none;
+      color: #3b2f25;
+      border-right: 7px solid #8c6d3f;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
     }
 
-    input[type="text"], input[type="time"]{
-      width:100%;
-      padding:6px;
-      border-radius:6px;
-      border:1px solid #ccc;
-    }
-
-    button{
-      padding:8px 12px;
-      border:none;
-      background:linear-gradient(135deg,var(--purple),var(--blue));
-      color:white;
-      cursor:pointer;
-      border-radius:8px;
-      font-weight:bold;
-    }
-
-    button.delete{
-      background:#ff4d6d;
-    }
-
-    .controls{
-      margin-top:12px;
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .stats{
-      margin-top:20px;
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-      gap:12px;
-    }
-
-    .stat-card{
-      background:linear-gradient(135deg,var(--blue),var(--purple));
-      color:white;
-      padding:12px;
-      border-radius:12px;
-    }
-
-    @media(max-width:600px){
-      th:nth-child(3),
-      th:nth-child(4),
-      td:nth-child(3),
-      td:nth-child(4){
-        display:none;
-      }
+    @media (max-width: 900px) {
+      .side-bar { width: 48px; }
     }
   </style>
 </head>
+
 <body>
 
-<div class="container">
-  <h1 id="greeting"></h1>
+  <div class="side-bar left"></div>
 
-  <div class="motivation" id="motivation"></div>
-
-  <div class="top-bar">
-    <div>
-      <strong>Date:</strong><br>
-      <input type="date" id="datePicker">
+  <div class="main-content">
+    <div class="verse">
+      يَا أَيُّهَا الَّذِينَ آمَنُوا اذْكُرُوا اللَّهَ ذِكْرًا كَثِيرًا
     </div>
 
-    <div class="progress-wrapper">
-      <div class="circle" id="progressCircle">0%</div>
-      <div id="progressText"></div>
+    <div class="search-box">
+      <input type="text" placeholder="ابحث عن الذكر أو السورة..." oninput="searchAthkar(this.value)">
     </div>
+
+    <div class="results" id="results"></div>
   </div>
 
-  <table id="taskTable">
-    <thead>
-      <tr>
-        <th>✓</th>
-        <th>Task</th>
-        <th>Start</th>
-        <th>End</th>
-        <th>Notes</th>
-        <th>X</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="side-bar right"></div>
 
-  <div class="controls">
-    <button onclick="openRepeat()">↻ Repeat Task</button>
-    <button onclick="addTask()">+ Add Task</button>
-    <button onclick="clearTasks()">Clear Day</button>
-  </div>
+  <script>
+    const data = [
+      { title: "أذكار الصباح", link: "AthkarAlsabah.html", keywords: ["صباح", "أذكار"] },
+      { title: "أذكار المساء", link: "AthkarAlmasaa.html", keywords: ["مساء"] },
+      { title: "دعاء الاستيقاظ من النوم", link: "WakingUpDua.html", keywords: ["استيقاظ", "نوم"] },
+      { title: "دعاء اللبس", link: "ClothesDua.html", keywords: ["لبس"] },
+      { title: "دعاء الخروج من المنزل", link: "LeavingHouseDua.html", keywords: ["خروج"] },
+      { title: "دعاء دخول الأماكن", link: "EnteringPlacesDua.html", keywords: ["دخول"] },
+      { title: "دعاء بعد الأذان", link: "AthanDua.html", keywords: ["أذان"] },
+      { title: "أدعية ما قبل النوم", link: "SleepDua.html", keywords: ["نوم"] },
+      { title: "دعاء بعد رؤية كابوس", link: "NightmareDua.html", keywords: ["كابوس"] },
+      { title: "أذكار صلاح الأهل", link: "FamilyAthkar.html", keywords: ["أهل"] },
+      { title: "أذكار الحرم", link: "HaramAthkar.html", keywords: ["حرم"] },
+      { title: "أذكار الصلاة", link: "AthkarAlsalah.html", keywords: ["صلاة"] },
+      { title: "السور اليومية", link: "DailySurahs.html", keywords: ["سور", "قرآن"] }
+    ];
 
-  <div class="stats">
-    <div class="stat-card" id="todayStat"></div>
-    <div class="stat-card" id="weekStat"></div>
-    <div class="stat-card" id="prevWeekStat"></div>
-  </div>
-</div>
+    function searchAthkar(query) {
+      const results = document.getElementById("results");
+      results.innerHTML = "";
+      if (!query.trim()) return;
 
-<script>
-  /* USER GREETING */
-  let userName = localStorage.getItem('userName');
-  if (!userName) {
-    userName = prompt('What is your name?') || 'There';
-    localStorage.setItem('userName', userName);
-  }
-  document.getElementById('greeting').textContent = `Hey ${userName}!`;
-
-  /* MOTIVATION */
-  const phrases = [
-    "Progress, not perfection.",
-    "Small steps still move you forward.",
-    "Your future self will thank you.",
-    "Consistency beats motivation.",
-    "Do one thing today better than yesterday."
-  ];
-  document.getElementById('motivation').textContent =
-    phrases[new Date().getDay() % phrases.length];
-
-  const tableBody = document.querySelector('#taskTable tbody');
-  const progressCircle = document.getElementById('progressCircle');
-  const progressText = document.getElementById('progressText');
-  const datePicker = document.getElementById('datePicker');
-
-  datePicker.valueAsDate = new Date();
-
-  function addTask(data={}, skipSave=false){
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td><input type="checkbox" class="done"></td>
-      <td><input type="text" value="${data.task||''}"></td>
-      <td><input type="time" value="${data.start||''}"></td>
-      <td><input type="time" value="${data.end||''}"></td>
-      <td><input type="text" value="${data.notes||''}"></td>
-      <td><button class="delete">X</button></td>
-    `;
-
-    row.querySelector('.done').checked = data.done || false;
-    row.querySelector('.done').onchange = updateProgress;
-    row.querySelector('.delete').onclick = () => {
-      row.remove();
-      updateProgress();
-      save();
-    };
-
-    tableBody.appendChild(row);
-    updateProgress();
-    if (!skipSave) save();
-  }
-
-  function updateProgress(){
-    const checks = [...document.querySelectorAll('.done')];
-    const total = checks.length;
-    const done = checks.filter(c => c.checked).length;
-    const pct = total ? Math.round(done / total * 100) : 0;
-
-    progressCircle.style.background =
-      `conic-gradient(#4caf50 ${pct * 3.6}deg, #e6e6e6 0deg)`;
-
-    progressCircle.textContent = pct + '%';
-    progressText.textContent = `${done}/${total} completed`;
-
-    updateStats(pct);
-    save();
-  }
-
-  function save(){
-    const data = [];
-    document.querySelectorAll('tbody tr').forEach(r => {
-      const i = r.querySelectorAll('input');
-      data.push({
-        done:i[0].checked,
-        task:i[1].value,
-        start:i[2].value,
-        end:i[3].value,
-        notes:i[4].value
+      data.forEach(item => {
+        if (
+          item.title.includes(query) ||
+          item.keywords.some(k => k.includes(query))
+        ) {
+          const a = document.createElement("a");
+          a.href = item.link;
+          a.textContent = item.title;
+          results.appendChild(a);
+        }
       });
-    });
-    localStorage.setItem(
-      datePicker.value,
-      JSON.stringify({ tasks:data, percent:progressCircle.textContent })
-    );
-  }
-
-  function load(){
-    tableBody.innerHTML = '';
-    const saved = localStorage.getItem(datePicker.value);
-    if (saved) JSON.parse(saved).tasks.forEach(addTask);
-    updateProgress();
-  }
-
-  function clearTasks(){
-    if (confirm('Clear today?')) {
-      tableBody.innerHTML = '';
-      updateProgress();
-      save();
     }
-  }
+  </script>
 
-  function updateStats(today){
-    document.getElementById('todayStat').textContent = `Today: ${today}%`;
-    document.getElementById('weekStat').textContent = `This Week: ${avg(0)}% avg`;
-    document.getElementById('prevWeekStat').textContent = `Last Week: ${avg(7)}% avg`;
-  }
-
-  function avg(offset){
-    let sum = 0, count = 0;
-    for(let i=0;i<7;i++){
-      const d = new Date();
-      d.setDate(d.getDate() - i - offset);
-      const key = d.toISOString().slice(0,10);
-      const s = localStorage.getItem(key);
-      if (s) {
-        sum += parseInt(JSON.parse(s).percent);
-        count++;
-      }
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./service-worker.js");
     }
-    return count ? Math.round(sum / count) : 0;
-  }
+  </script>
 
-  function openRepeat(){
-    const task = prompt('Task name:');
-    if (!task) return;
-    const time = prompt('Start time (HH:MM):','15:30');
-    const days = parseInt(prompt('Repeat for how many days?','14'));
-    const interval = parseInt(prompt('Every how many days?','2'));
-
-    const baseDate = new Date(datePicker.value);
-    for(let i=0;i<days;i+=interval){
-      const d = new Date(baseDate);
-      d.setDate(d.getDate() + i);
-      const key = d.toISOString().slice(0,10);
-      const saved = localStorage.getItem(key);
-      const obj = saved ? JSON.parse(saved) : { tasks:[], percent:'0%' };
-      obj.tasks.push({
-        done:false,
-        task,
-        start:time,
-        end:'',
-        notes:'Repeated'
-      });
-      localStorage.setItem(key, JSON.stringify(obj));
-    }
-    load();
-  }
-
-  datePicker.onchange = load;
-  load();
-
-  /* SERVICE WORKER */
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js');
-  }
-</script>
 </body>
 </html>

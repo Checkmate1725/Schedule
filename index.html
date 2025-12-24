@@ -1,0 +1,410 @@
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Task Scheduler</title>
+
+  <!-- PWA Manifest (inline, offline-first) -->
+  <link rel="manifest" href='data:application/json,{"name":"Daily Task Scheduler","short_name":"Scheduler","start_url":".","display":"standalone","background_color":"#f7f5ff","theme_color":"#9a8cff","icons":[{"src":"data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" rx=\"20\" fill=\"%239a8cff\"/><text x=\"50\" y=\"62\" font-size=\"48\" text-anchor=\"middle\" fill=\"white\">✓</text></svg>","sizes":"192x192","type":"image/svg+xml"}]}'>
+
+  <style>
+    :root{
+      --pink:#f2a1c2;
+      --purple:#9a8cff;
+      --blue:#8bbcff;
+      --card:#ffffff;
+      --green:#4caf50;
+      --bg-gradient:linear-gradient(135deg,#f5e9f1,#ece9ff,#e9f2ff);
+    }
+
+    body.dark{
+      --pink:#8a4f6a;
+      --purple:#4b42a8;
+      --blue:#355fa8;
+      --card:#181824;
+      --green:#4caf50;
+      --bg-gradient:linear-gradient(135deg,#0f0c1a,#14122a,#0e1626);
+      color:#e8e8ee;
+    }
+
+    body.dark button{
+      background:linear-gradient(135deg,#5b52c4,#466fd1);
+      color:#ffffff;
+    }
+
+    body{
+      font-family: Arial, Helvetica, sans-serif;
+      background:var(--bg-gradient);
+      margin:0;
+      padding:15px;
+      min-height:100vh;
+    }
+
+    h1{ margin:0 0 5px 0; }
+
+    .container{
+      position:relative;
+      max-width:1100px;
+      margin:auto;
+      background:var(--card);
+      padding:15px;
+      border-radius:16px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    #darkToggle{
+      position:absolute;
+      top:14px;
+      right:14px;
+      border:none;
+      background:linear-gradient(135deg,var(--purple),var(--blue));
+      color:white;
+      width:44px;
+      height:44px;
+      border-radius:50%;
+      cursor:pointer;
+      font-size:18px;
+    }
+
+    body.dark #darkToggle{
+      background:linear-gradient(135deg,var(--blue),var(--purple));
+    }
+
+    .top-bar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:15px;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:15px;
+    }
+
+    .motivation{
+      background:linear-gradient(135deg,var(--pink),var(--purple));
+      color:#ffffff;
+      padding:10px 14px;
+      border-radius:12px;
+      font-weight:bold;
+      margin-bottom:12px;
+    }
+
+    .progress-wrapper{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .circle{
+      width:80px;
+      height:80px;
+      border-radius:50%;
+      background:conic-gradient(#4caf50 0deg, #eee 0deg);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:bold;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:10px;
+    }
+
+    th, td{
+      border:1px solid #ddd;
+      padding:6px;
+      text-align:center;
+      font-size:14px;
+    }
+
+    th{
+      background:rgba(154,140,255,0.25);
+    }
+
+    input[type="text"], input[type="time"]{
+      width:100%;
+      padding:6px;
+      border-radius:6px;
+      border:1px solid #ccc;
+    }
+
+    button{
+      padding:8px 12px;
+      border:none;
+      background:linear-gradient(135deg,#7f74e8,#6fa0ff);
+      color:#ffffff;
+      cursor:pointer;
+      border-radius:8px;
+      font-weight:bold;
+    }
+
+    button.delete{
+      background:#e94b6a;
+      color:white;
+    }
+
+    .controls{
+      margin-top:12px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    /* Improve tap / focus visibility (Light Mode) */
+    button:active,
+    button:focus-visible{
+      outline:none;
+      box-shadow:0 0 0 3px rgba(154,140,255,0.45);
+    }
+
+    input:focus-visible{
+      outline:none;
+      border-color:var(--purple);
+      box-shadow:0 0 0 3px rgba(154,140,255,0.35);
+    }
+
+    .stats{
+      margin-top:20px;
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+      gap:12px;
+    }
+
+    .stat-card{
+      background:linear-gradient(135deg,var(--blue),var(--purple));
+      color:white;
+      padding:12px;
+      border-radius:12px;
+    }
+
+    @media(max-width:600px){
+      th:nth-child(3), th:nth-child(4), td:nth-child(3), td:nth-child(4){ display:none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <button id="darkToggle" onclick="toggleDarkMode()">🌙</button>
+  <h1 id="greeting">Daily Task Scheduler</h1>
+
+  <div class="motivation" id="motivation"></div>
+
+  <div class="top-bar">
+    <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+      <div>
+        <strong>Date:</strong><br>
+        <input type="date" id="datePicker">
+      </div>
+      <div>
+        <strong>Weekly View:</strong><br>
+        <a href="Weekly%20Chart.html" class="week-link">📊 Weekly Chart</a>
+      </div>
+    </div>
+    <div>
+      <strong>Date:</strong><br>
+      <input type="date" id="datePicker" />
+    </div>
+
+    <div class="progress-wrapper">
+      <div class="circle" id="progressCircle">0%</div>
+      <div id="progressText"></div>
+    </div>
+  </div>
+
+  <table id="taskTable">
+    <thead>
+      <tr>
+        <th>✓</th>
+        <th>Task</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Notes</th>
+        <th>X</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="controls">
+    <button onclick="openRepeat()">↻ Repeat Task</button>
+    <button onclick="addTask()">+ Add Task</button>
+    <button onclick="clearTasks()">Clear Day</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card" id="todayStat"></div>
+    <div class="stat-card" id="weekStat"></div>
+    <div class="stat-card" id="prevWeekStat"></div>
+  </div>
+</div>
+
+<script>
+/* =====================
+   SAFE CORE SCRIPT
+   ===================== */
+
+// ----- Dark Mode (FIXED) -----
+function toggleDarkMode(){
+  document.body.classList.toggle('dark');
+  localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+}
+
+if (localStorage.getItem('darkMode') === 'true') {
+  document.body.classList.add('dark');
+}
+
+// ----- Greeting -----
+let userName = localStorage.getItem('userName');
+if (!userName) {
+  userName = prompt('What is your name?') || 'There';
+  localStorage.setItem('userName', userName);
+}
+document.getElementById('greeting').textContent = `Hey ${userName}!`;
+
+// ----- Motivation -----
+const phrases = [
+  'Progress, not perfection.',
+  'Small steps still move you forward.',
+  'Your future self will thank you.',
+  'Consistency beats motivation.',
+  'Do one thing today better than yesterday.'
+];
+
+document.getElementById('motivation').textContent =
+  phrases[new Date().getDay() % phrases.length];
+
+// ----- Core Elements -----
+const tableBody = document.querySelector('#taskTable tbody');
+const progressCircle = document.getElementById('progressCircle');
+const progressText = document.getElementById('progressText');
+const datePicker = document.getElementById('datePicker');
+
+datePicker.valueAsDate = new Date();
+
+// ----- Tasks -----
+function addTask(data = {}, skipSave = false){
+  const row = document.createElement('tr');
+  row.innerHTML = `
+    <td><input type="checkbox" class="done"></td>
+    <td><input type="text" value="${data.task || ''}"></td>
+    <td><input type="time" value="${data.start || ''}"></td>
+    <td><input type="time" value="${data.end || ''}"></td>
+    <td><input type="text" value="${data.notes || ''}"></td>
+    <td><button class="delete">X</button></td>`;
+
+  const check = row.querySelector('.done');
+  check.checked = data.done || false;
+  check.onchange = updateProgress;
+
+  row.querySelector('.delete').onclick = () => {
+    row.remove();
+    updateProgress();
+    save();
+  };
+
+  tableBody.appendChild(row);
+  updateProgress();
+  if (!skipSave) save();
+}
+
+function updateProgress(){
+  const checks = [...document.querySelectorAll('.done')];
+  const total = checks.length;
+  const done = checks.filter(c => c.checked).length;
+  const pct = total ? Math.round(done / total * 100) : 0;
+
+  progressCircle.style.background =
+    `conic-gradient(#4caf50 ${pct * 3.6}deg, #e6e6e6 0deg)`;
+
+  progressCircle.textContent = pct + '%';
+  progressText.textContent = `${done}/${total} completed`;
+
+  updateStats(pct);
+  save();
+}
+
+function save(){
+  const data = [];
+  document.querySelectorAll('tbody tr').forEach(r => {
+    const i = r.querySelectorAll('input');
+    data.push({
+      done: i[0].checked,
+      task: i[1].value,
+      start: i[2].value,
+      end: i[3].value,
+      notes: i[4].value
+    });
+  });
+
+  localStorage.setItem(
+    datePicker.value,
+    JSON.stringify({ tasks: data, percent: progressCircle.textContent })
+  );
+}
+
+function load(){
+  tableBody.innerHTML = '';
+  const saved = localStorage.getItem(datePicker.value);
+  if (saved) JSON.parse(saved).tasks.forEach(t => addTask(t, true));
+  updateProgress();
+}
+
+function clearTasks(){
+  if (confirm('Clear today?')) {
+    tableBody.innerHTML = '';
+    updateProgress();
+    save();
+  }
+}
+
+function updateStats(today){
+  document.getElementById('todayStat').textContent = `Today: ${today}%`;
+  document.getElementById('weekStat').textContent = `This Week: ${avg(0)}% avg`;
+  document.getElementById('prevWeekStat').textContent = `Last Week: ${avg(7)}% avg`;
+}
+
+function avg(offset){
+  let sum = 0, count = 0;
+  for (let i = 0; i < 7; i++){
+    const d = new Date();
+    d.setDate(d.getDate() - i - offset);
+    const key = d.toISOString().slice(0,10);
+    const s = localStorage.getItem(key);
+    if (s){ sum += parseInt(JSON.parse(s).percent); count++; }
+  }
+  return count ? Math.round(sum / count) : 0;
+}
+
+function openRepeat(){
+  const task = prompt('Task name:');
+  if (!task) return;
+  const time = prompt('Start time (HH:MM):', '15:30');
+  const days = parseInt(prompt('Repeat for how many days?', '14'));
+  const interval = parseInt(prompt('Every how many days?', '2'));
+
+  const base = new Date(datePicker.value);
+  for (let i = 0; i < days; i += interval){
+    const d = new Date(base);
+    d.setDate(d.getDate() + i);
+    const key = d.toISOString().slice(0,10);
+    const saved = localStorage.getItem(key);
+    const obj = saved ? JSON.parse(saved) : { tasks: [], percent: '0%' };
+    obj.tasks.push({ done:false, task, start:time, end:'', notes:'Repeated' });
+    localStorage.setItem(key, JSON.stringify(obj));
+  }
+  load();
+}
+
+datePicker.onchange = load;
+load();
+
+// ----- Service Worker -----
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js');
+}
+</script>
+
+</body>
+</html>
